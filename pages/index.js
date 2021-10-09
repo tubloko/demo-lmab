@@ -1,59 +1,111 @@
-import styles from '../styles/Home.module.css'
+import React, { useEffect } from 'react';
+import { useRouter } from 'next/router';
+import Link from 'next/link'
+import { useGoogleLogin } from 'react-google-login';
+import {useMutation, gql, useApolloClient} from "@apollo/client";
+import * as qs from 'qs';
+import { parseCookies } from "../common/helpers/parseCookies";
+import createApolloClient from "../apolloClient";
+import { Layout } from "../components";
+import { IS_LOGGED_IN } from "../common/queries";
+import { REDIRECT_URL } from "../common/constants/apiURLs";
 
-export default function Home() {
+const GET_USER = gql`
+  query GetUser($id: ID!) {
+    getUser(id: $id) {
+      user {
+        email
+        nickname
+        firstName
+        lastName
+        token
+        id
+      }
+    }
+  }
+`;
+
+const SIGN_IN_WITH_GOOGLE = gql`
+  mutation SignInWithGoogle($accessToken: String!) {
+    signInWithGoogle(accessToken: $accessToken) {
+      user {
+        email
+        googleId
+        nickname
+        firstName
+        lastName
+      } 
+    }
+  }
+`;
+
+const Page = ({ data }) => {
+  const client = useApolloClient();
+  const router = useRouter();
+  const [signInWithGoogle, { error }] = useMutation(SIGN_IN_WITH_GOOGLE, {
+    onCompleted: ({ signInWithGoogle: { user: { email, googleId, nickname, firstName, lastName } } }) => {
+      router.push( {
+        pathname: 'auth/register',
+        query: qs.stringify({
+          email,
+          googleId,
+          nickname,
+          firstName,
+          lastName,
+        }),
+      });
+    }
+  });
+  const { signIn } = useGoogleLogin({
+    onSuccess: ({ tokenId, googleId }) => signInWithGoogle({ variables: { accessToken: tokenId, googleId } }),
+    clientId: '1058652577809-befvkbiblen37vfvvdvf11c4pks8dnuq.apps.googleusercontent.com',
+    redirectUri: REDIRECT_URL,
+    onFailure: () => console.log('fail'),
+  });
+
+  useEffect(() => {
+    client.cache.writeQuery({
+      query: IS_LOGGED_IN,
+      data: {
+        isLoggedIn: Boolean(data.token),
+      },
+    })
+  }, []);
+
+  if (error) return <p>something went wrong {error.message}</p>;
+  if (data.error) return <p>{data.errorMessage}</p>;
+
   return (
-    <div className={styles.container}>
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
-    </div>
-  )
+    <Layout>
+      <Link href={'/profile'}>Profile</Link>
+      <div>
+        <button onClick={signIn}>sign in with google</button>
+      </div>
+      <div>
+        <button onClick={() => router.push('auth/register')}>sign in</button>
+      </div>
+    </Layout>
+  );
 }
+
+export const getServerSideProps = async ({ req, res }) => {
+  const data = parseCookies(req);
+
+  if (res) {
+    if (Object.keys(data).length === 0 && data.constructor === Object) {
+      res.writeHead(301, { Location: "/" });
+      res.end();
+    }
+  }
+
+  const { token, id } = JSON.parse(data.user);
+  const client = createApolloClient(token);
+  try {
+    const { data: { getUser: { user } } } = await client.query({ query: GET_USER, variables: { id } });
+    return { props: { data: user } };
+  } catch (error) {
+    return { props: { data: { error, errorMessage: error.message } } };
+  }
+}
+
+export default Page;

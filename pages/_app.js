@@ -1,7 +1,22 @@
-import Head from 'next/head'
-import '../styles/globals.css'
+import React, { useMemo } from 'react';
+import Head from 'next/head';
+import  { ApolloProvider } from "@apollo/client";
+import { CookiesProvider, useCookies } from "react-cookie";
+import createApolloClient from '../apolloClient';
+import { createGlobalStyle } from 'styled-components';
+
+const GlobalStyle = createGlobalStyle`
+  * {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+  }
+`;
 
 export default function MyApp({ Component, pageProps }) {
+  const [cookies] = useCookies(['user']);
+  const client = useMemo(() => createApolloClient(cookies?.user?.token), []);
+
   return (
     <>
       <Head>
@@ -13,25 +28,16 @@ export default function MyApp({ Component, pageProps }) {
         />
         <meta name="description" content="Description" />
         <meta name="keywords" content="Keywords" />
-        <title>Next.js PWA Example</title>
-
+        <title>lmab</title>
         <link rel="manifest" href="/manifest.json" />
-        <link
-          href="/icons/favicon-16x16.png"
-          rel="icon"
-          type="image/png"
-          sizes="16x16"
-        />
-        <link
-          href="/icons/favicon-32x32.png"
-          rel="icon"
-          type="image/png"
-          sizes="32x32"
-        />
-        <link rel="apple-touch-icon" href="/apple-icon.png"></link>
         <meta name="theme-color" content="#317EFB" />
       </Head>
-      <Component {...pageProps} />
+      <GlobalStyle />
+      <CookiesProvider>
+        <ApolloProvider client={client}>
+          <Component {...pageProps} />
+        </ApolloProvider>
+      </CookiesProvider>
     </>
   )
 }

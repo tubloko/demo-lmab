@@ -8,9 +8,18 @@
     "start": "next start"
   },
   "dependencies": {
+    "@apollo/client": "^3.4.8",
+    "cookie": "^0.4.1",
+    "google-auth-library": "^7.9.1",
+    "graphql": "^15.5.1",
     "next": "latest",
     "next-pwa": "^3.1.0",
+    "qs": "^6.10.1",
     "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+    "react-cookie": "^4.1.1",
+    "react-dom": "^17.0.2",
+    "react-facebook-login": "^4.1.1",
+    "react-google-login": "^5.2.2",
+    "styled-components": "^5.3.1"
   }
 }
