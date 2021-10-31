@@ -1,45 +1,60 @@
 import React from 'react';
-import { useQuery } from "@apollo/client";
+import Image from "next/image";
+import { useCookies } from 'react-cookie';
+import Link from 'next/link';
+import {useApolloClient, useQuery} from "@apollo/client";
 import styled from 'styled-components';
-import { RICH_BLACK, BANANA_MANIA } from '../common/constants/colors';
 import { IS_LOGGED_IN } from "../common/queries";
-
-const Header = styled.header`
-  font-size: 20px;
-  background-color: ${RICH_BLACK};
-  color: ${BANANA_MANIA};
-  text-transform: uppercase;
-  cursor: pointer;
-`;
-
-const Nav = styled.nav`
-  display: flex;
-  height: 70px;
-  align-content: center;
-  flex-wrap: wrap;
-`;
-
-const Ul = styled.ul`
-  display: flex;
-  justify-content: center;
-  gap: 5%;
-  width: 40%;
-  list-style: none;
-`;
+import personPlaceholder from '../public/images/person_placeholder.png';
+import {useRouter} from "next/router";
+import Nav from 'react-bootstrap/Nav';
+import Navbar from 'react-bootstrap/Navbar';
+import Container from 'react-bootstrap/Container';
 
 const NavBar = () => {
-  const { data } = useQuery(IS_LOGGED_IN);
+  const { push } = useRouter();
+  const removeCookie = useCookies(['user']);
+  const client = useApolloClient();
+  const { data } = useQuery(IS_LOGGED_IN, { ssr: false });
+
+  const logout = () => {
+    removeCookie[2]('user');
+    client.cache.writeQuery({
+      query: IS_LOGGED_IN,
+      data: {
+        isLoggedIn: false,
+      },
+    });
+    push('login');
+  }
 
   return (
-    <Header>
-      <Nav>
-        <Ul>
-          <li>dashboard</li>
-          <li>my challenges</li>
-          <li>profile</li>
-        </Ul>
-      </Nav>
-    </Header>
+    <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
+      <Container>
+        <Navbar.Brand href="/">Lmab</Navbar.Brand>
+        <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+        <Navbar.Collapse id="responsive-navbar-nav">
+          <Nav className="me-auto">
+            <Link href={'/'} passHref><Nav.Link>Dashboard</Nav.Link></Link>
+            <Link href={'/my-challenges'} passHref><Nav.Link>My challenges</Nav.Link></Link>
+            <Link href={'/profile'} passHref><Nav.Link>Profile</Nav.Link></Link>
+          </Nav>
+          <Nav>
+            {!data?.isLoggedIn ? (
+                <>
+                  <Link href={'/login'} passHref><Nav.Link>Sign in</Nav.Link></Link>
+                  <Link href={'/register'} passHref><Nav.Link>Sign up</Nav.Link></Link>
+                </>
+            ) : (
+              <>
+                <Image src={personPlaceholder} alt={'current user'} width={50} height={50} />
+                <Nav.Link onClick={logout}>Log out</Nav.Link>
+              </>
+            )}
+          </Nav>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
   );
 }
 

@@ -1,5 +1,6 @@
 import Document from 'next/document';
 import { ServerStyleSheet } from 'styled-components';
+import SSRProvider from 'react-bootstrap/SSRProvider';
 
 export default class MyDocument extends Document {
   static async getInitialProps(ctx) {
@@ -10,7 +11,10 @@ export default class MyDocument extends Document {
       ctx.renderPage = () =>
         originalRenderPage({
           enhanceApp: (App) => (props) =>
-            sheet.collectStyles(<App {...props} />),
+            sheet.collectStyles(
+            <SSRProvider>
+              <App {...props} />
+            </SSRProvider>),
         });
 
       const initialProps = await Document.getInitialProps(ctx);

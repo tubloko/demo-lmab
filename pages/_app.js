@@ -4,6 +4,8 @@ import  { ApolloProvider } from "@apollo/client";
 import { CookiesProvider, useCookies } from "react-cookie";
 import createApolloClient from '../apolloClient';
 import { createGlobalStyle } from 'styled-components';
+import Layout from "../components/Layout";
+import 'bootswatch/dist/lux/bootstrap.min.css';
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -35,7 +37,9 @@ export default function MyApp({ Component, pageProps }) {
       <GlobalStyle />
       <CookiesProvider>
         <ApolloProvider client={client}>
-          <Component {...pageProps} />
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
         </ApolloProvider>
       </CookiesProvider>
     </>

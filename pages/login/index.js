@@ -2,6 +2,11 @@ import React, { useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { gql, useMutation } from '@apollo/client';
 import { useRouter } from "next/router";
+import FloatingLabel from "react-bootstrap/FloatingLabel";
+import Form from "react-bootstrap/Form";
+import Button from "react-bootstrap/Button";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
 
 const LOGIN = gql`
   mutation Login($email: String! $password: String!) {
@@ -20,15 +25,13 @@ const LOGIN = gql`
   }
 `
 
-const Login = () => {
+const LoginPage = () => {
   const { push } = useRouter();
-  const [_, setCookie] = useCookies(["user"]);
+  const setCookie = useCookies(["user"]);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const [login] = useMutation(LOGIN, {
-    onCompleted: () => push('/')
-  });
+  const [login] = useMutation(LOGIN);
 
   const handleSignIn = async () => {
     try {
@@ -39,7 +42,7 @@ const Login = () => {
         }
       });
 
-      setCookie("user", JSON.stringify(user), {
+      setCookie[1]("user", JSON.stringify(user), {
         path: "/",
         maxAge: 60 * 60 * 60,
         sameSite: true,
@@ -47,16 +50,27 @@ const Login = () => {
     } catch (err) {
       console.log(err);
     }
+    push('/');
   };
 
   return (
     <>
-      <div>
-        <input onChange={(e) => setEmail(e.target.value)} value={email} type="text" placeholder="enter email" /> <br/>
-        <input onChange={(e) => setPassword(e.target.value)} value={password} type="password" placeholder="enter password" />
-      </div>
-      <button onClick={handleSignIn}>login</button>
+      <Row>
+        <Col sm='12' md='6' lg='6' className={'mt-2'}>
+          <FloatingLabel controlId="floatingInput" label="Email address" className="mb-3">
+            <Form.Control value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="Email" />
+          </FloatingLabel>
+          <FloatingLabel controlId="floatingPassword" label="Password">
+            <Form.Control value={password} onChange={(e) => setPassword(e.target.value)} type="password" placeholder="Password" />
+          </FloatingLabel>
+        </Col>
+      </Row>
+      <Row>
+        <Col sm='12' md='6' lg='6' className={'mt-2'}>
+          <Button onClick={handleSignIn} variant="outline-primary" size={'md'}>Log in</Button>
+        </Col>
+      </Row>
     </>
   )
 }
-export default Login
+export default LoginPage;

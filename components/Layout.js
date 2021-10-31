@@ -1,18 +1,13 @@
 import React from 'react';
-import styled from 'styled-components';
 import NavBar from './NavBar';
-
-const PageWrapper = styled.div`
-  max-width: 1300px;
-  margin: auto;
-`;
+import Container from "react-bootstrap/Container";
 
 const Layout = ({ children }) => {
   return (
-    <PageWrapper>
+    <Container fluid={'lg'}>
       <NavBar />
       {children}
-    </PageWrapper>
+    </Container>
   );
 }
 
