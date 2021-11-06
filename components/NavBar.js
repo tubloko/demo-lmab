@@ -25,7 +25,6 @@ const NavBar = () => {
         isLoggedIn: false,
       },
     });
-    console.log('before push')
     push('/login');
   }
 
