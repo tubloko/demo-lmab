@@ -1,11 +1,15 @@
 import React, { useMemo } from 'react';
+import App from 'next/app'
 import Head from 'next/head';
-import  { ApolloProvider } from "@apollo/client";
+import { ApolloProvider, gql } from "@apollo/client";
 import { CookiesProvider, useCookies } from "react-cookie";
 import createApolloClient from '../apolloClient';
 import { createGlobalStyle } from 'styled-components';
 import Layout from "../components/Layout";
 import 'bootswatch/dist/lux/bootstrap.min.css';
+import { parseCookies } from "../common/helpers/parseCookies";
+import { useSetIsLoggedIn } from "../common/hooks/useSetIsLoggedIn";
+import { GET_USER } from "../common/queries";
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -15,9 +19,10 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
-export default function MyApp({ Component, pageProps }) {
+export default function MyApp({ Component, pageProps, data }) {
   const [cookies] = useCookies(['user']);
   const client = useMemo(() => createApolloClient(cookies?.user?.token), []);
+  useSetIsLoggedIn({ data, client });
 
   return (
     <>
@@ -44,4 +49,26 @@ export default function MyApp({ Component, pageProps }) {
       </CookiesProvider>
     </>
   )
+}
+
+MyApp.getInitialProps = async (appContext) => {
+  const appProps = await App.getInitialProps(appContext);
+
+  const data = parseCookies(appContext.ctx.req);
+
+  if (appContext.ctx.res) {
+    if (Object.keys(data).length === 0 && data.constructor === Object) {
+      appContext.ctx.res.writeHead(301, { Location: "/" });
+      appContext.ctx.res.end();
+    }
+  }
+
+  try {
+    const { token, id } = JSON.parse(data.user);
+    const client = createApolloClient(token);
+    const { data: { getUser: { user } } } = await client.query({ query: GET_USER, variables: { id } });
+    return { ...appProps, data: user };
+  } catch (error) {
+    return { ...appProps, data: { errorMessage: error.message } };
+  }
 }
