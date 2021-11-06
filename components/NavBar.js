@@ -18,14 +18,15 @@ const NavBar = () => {
   const { data } = useQuery(IS_LOGGED_IN, { ssr: false });
 
   const logout = () => {
-    removeCookie[2]('user');
+    removeCookie[2]('user', { path: '/' });
     client.cache.writeQuery({
       query: IS_LOGGED_IN,
       data: {
         isLoggedIn: false,
       },
     });
-    push('login');
+    console.log('before push')
+    push('/login');
   }
 
   return (
