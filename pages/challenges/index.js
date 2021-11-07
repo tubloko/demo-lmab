@@ -22,7 +22,7 @@ const Challenges = () => {
                   <Link href={`/challenges/view-challenge/${id}`} passHref>
                     <Button variant="outline-info">View</Button>
                   </Link>
-                  <Link href={`/challenges/${id}`} passHref>
+                  <Link href={`/challenges/challenge-room/${id}`} passHref>
                     <Button variant="outline-primary">Subscribe</Button>
                   </Link>
                 </div>

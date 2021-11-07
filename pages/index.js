@@ -9,7 +9,9 @@ const Page = () => {
     <Row className={'mt-5'}>
       <div className={'text-center'}>
         <h2>You may create your own challenge...</h2>
-        <Button variant='success'>Create a challenge</Button>
+        <Link href={'/challenges/create-challenge'} passHref>
+          <Button variant='success'>Create a challenge</Button>
+        </Link>
       </div>
       <div className={'mt-5 text-center'}>
         <h3>or participate in an existing one!</h3>

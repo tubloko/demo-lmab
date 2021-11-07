@@ -7,9 +7,12 @@ import createApolloClient from '../apolloClient';
 import { createGlobalStyle } from 'styled-components';
 import Layout from "../components/Layout";
 import 'bootswatch/dist/lux/bootstrap.min.css';
+import '@fortawesome/fontawesome-svg-core/styles.css';
 import { parseCookies } from "../common/helpers/parseCookies";
 import { useSetIsLoggedIn } from "../common/hooks/useSetIsLoggedIn";
 import { GET_USER } from "../common/queries";
+import { config } from '@fortawesome/fontawesome-svg-core';
+config.autoAddCss = false
 
 const GlobalStyle = createGlobalStyle`
   * {
