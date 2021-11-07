@@ -1,6 +1,6 @@
-import React, { useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
-import { MessageList } from "../../components/MessageList";
+import { MessageList } from "../../../components/MessageList";
 
 const SEND_MESSAGE = gql`
   mutation CreateChat($content: String! $from: String!) {
@@ -40,7 +40,7 @@ const ChallengeRoom = () => {
   const [sendMessage] = useMutation(SEND_MESSAGE);
   const [message, setMessage] = useState('');
 
-  const subscribeToNewMessages = () => {
+  useEffect(() => {
     subscribeToMore({
       document: SUBSCRIPTION_CHALLENGE_ROOM,
       updateQuery: (prev, { subscriptionData }) => {
@@ -53,7 +53,7 @@ const ChallengeRoom = () => {
         }
       }
     });
-  }
+  }, []);
 
   if (messagesLoading) return <p>Loading...</p>;
 
@@ -69,8 +69,8 @@ const ChallengeRoom = () => {
 
   return (
     <div>
-      <h4>Chant</h4>
-      <MessageList subscribeToNewMessages={subscribeToNewMessages} messages={messages} />
+      <h4>Chat</h4>
+      <MessageList messages={messages} />
       <div>
         <input type="text" value={message} onChange={e => setMessage(e.target.value)}/><br/>
         <button onClick={handleClick}>send</button>

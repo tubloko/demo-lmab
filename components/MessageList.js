@@ -1,10 +1,6 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
-const MessageList = ({ messages, subscribeToNewMessages }) => {
-
-  useEffect(() => {
-    subscribeToNewMessages();
-  }, []);
+const MessageList = ({ messages }) => {
 
   return (
     <>
