@@ -59,13 +59,6 @@ MyApp.getInitialProps = async (appContext) => {
 
   const data = parseCookies(appContext.ctx.req);
 
-  if (appContext.ctx.res) {
-    if (Object.keys(data).length === 0 && data.constructor === Object) {
-      appContext.ctx.res.writeHead(301, { Location: "/" });
-      appContext.ctx.res.end();
-    }
-  }
-
   try {
     const { token, id } = JSON.parse(data.user);
     const client = createApolloClient(token);
