@@ -1,5 +1,6 @@
 1) Create a page "view challenge", display challenge title, description, users who participates in this challenge (hide the list of users for mobiles or add dropdown with the list of users)
-2) add a button 'on subscribe' (the button should show 'unsubscribe' if the user's already subscribed) to participate in the challenge, display on 'list of challenges' page and 'view challenge' page
+2) add a button 'on subscribe' to participate in the challenge (the button should show 'unsubscribe' if the user's already subscribed), 
+display on 'list of challenges' page and 'view challenge' page
 3) implement a feature to show if users are online
 4) create 'chat' page it should be part of challenge room page
 5) create a page of existing users 

@@ -3,8 +3,7 @@ import Image from "next/image";
 import { useCookies } from 'react-cookie';
 import Link from 'next/link';
 import {useApolloClient, useQuery} from "@apollo/client";
-import styled from 'styled-components';
-import { IS_LOGGED_IN } from "../common/queries";
+import { GET_USER_CLIENT } from "../common/queries";
 import personPlaceholder from '../public/images/person_placeholder.png';
 import {useRouter} from "next/router";
 import Nav from 'react-bootstrap/Nav';
@@ -15,12 +14,12 @@ const NavBar = () => {
   const { push } = useRouter();
   const removeCookie = useCookies(['user']);
   const client = useApolloClient();
-  const { data } = useQuery(IS_LOGGED_IN, { ssr: false });
+  const { data } = useQuery(GET_USER_CLIENT, { ssr: false });
 
   const logout = () => {
     removeCookie[2]('user', { path: '/' });
     client.cache.writeQuery({
-      query: IS_LOGGED_IN,
+      query: GET_USER_CLIENT,
       data: {
         isLoggedIn: false,
       },

@@ -1,8 +1,11 @@
 import { gql } from "@apollo/client";
 
-export const IS_LOGGED_IN = gql`
-  query IsUserLoggedIn {
+export const GET_USER_CLIENT = gql`
+  query GetUserClient {
     isLoggedIn @client
+    nickname @client
+    userId @client
+    challengeRoomsIds @client
   }
 `;
 
@@ -16,6 +19,7 @@ export const GET_USER = gql`
         lastName
         token
         id
+        challengeRoomsIds
       }
     }
   }
@@ -29,6 +33,17 @@ export const GET_CHALLENGE_ROOMS_LIST = gql`
       author
       id
       userId
+    }
+  }
+`;
+
+export const ON_SUBSCRIBE_TO_CHALLENGE = gql`
+  mutation OnSubscribe($challengeRoomId: String! $challengeRoomIds: [String] $id: ID!) {
+    onSubscribe(challengeRoomId: $challengeRoomId challengeRoomIds: $challengeRoomIds id: $id) {
+      user {
+        id
+        challengeRoomsIds
+      }
     }
   }
 `;

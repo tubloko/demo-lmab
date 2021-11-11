@@ -1,13 +1,14 @@
 import React from 'react';
-import { IS_LOGGED_IN } from "../queries";
+import { GET_USER_CLIENT } from "../queries";
 
 const useSetUser = ({ data, client }) => {
   client.cache.writeQuery({
-    query: IS_LOGGED_IN,
+    query: GET_USER_CLIENT,
     data: {
       isLoggedIn: Boolean(data.token),
       nickname: data.nickname,
-      userId: data.id
+      userId: data.id,
+      challengeRoomsIds: data.challengeRoomsIds,
     },
   })
 }
