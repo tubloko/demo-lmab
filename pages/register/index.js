@@ -43,7 +43,6 @@ const SIGN_IN_WITH_GOOGLE = gql`
 `;
 
 const RegisterPage = () => {
-  const client = useApolloClient();
   const {query, push} = useRouter();
   const setCookie = useCookies(["user"]);
   const [nickname, setNickname] = useState(query.nickname || '');

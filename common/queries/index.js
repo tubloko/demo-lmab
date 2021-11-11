@@ -20,3 +20,15 @@ export const GET_USER = gql`
     }
   }
 `;
+
+export const GET_CHALLENGE_ROOMS_LIST = gql`
+  query ListChallenges {
+    listChallengeRooms {
+      description
+      title
+      author
+      id
+      userId
+    }
+  }
+`;

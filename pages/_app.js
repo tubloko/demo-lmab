@@ -9,7 +9,7 @@ import Layout from "../components/Layout";
 import 'bootswatch/dist/lux/bootstrap.min.css';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import { parseCookies } from "../common/helpers/parseCookies";
-import { useSetIsLoggedIn } from "../common/hooks/useSetIsLoggedIn";
+import { useSetUser } from "../common/hooks/useSetUser";
 import { GET_USER } from "../common/queries";
 import { config } from '@fortawesome/fontawesome-svg-core';
 config.autoAddCss = false
@@ -25,7 +25,7 @@ const GlobalStyle = createGlobalStyle`
 export default function MyApp({ Component, pageProps, data }) {
   const [cookies] = useCookies(['user']);
   const client = useMemo(() => createApolloClient(cookies?.user?.token), []);
-  useSetIsLoggedIn({ data, client });
+  useSetUser({ data, client });
 
   return (
     <>

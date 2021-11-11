@@ -36,7 +36,7 @@ const NavBar = () => {
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto">
             <Link href={'/'} passHref><Nav.Link>Dashboard</Nav.Link></Link>
-            <Link href={'/my-challenges'} passHref><Nav.Link>My challenges</Nav.Link></Link>
+            <Link href={'/challenges/my-challenges'} passHref><Nav.Link>My challenges</Nav.Link></Link>
             <Link href={'/profile'} passHref><Nav.Link>Profile</Nav.Link></Link>
           </Nav>
           <Nav>

@@ -4,20 +4,26 @@ import Card from "react-bootstrap/Card";
 import Link from "next/link";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
+import { parseCookies } from "../../common/helpers/parseCookies";
+import createApolloClient from "../../apolloClient";
+import { GET_CHALLENGE_ROOMS_LIST } from '../../common/queries';
 
-const Challenges = () => {
+const Challenges = ({ challenges = [], errorMessage = '' }) => {
+
+  if (errorMessage) {
+    return <p className={'mt-3'}>OooOps, something went wrong...{errorMessage}</p>;
+  }
+
   return (
     <Row className={'mt-3'}>
-      {challenges.map(({ id }) => {
+      {challenges.length ? challenges.map(({ id, title, description }) => {
         return (
-          <Col key={id}>
+          <Col key={id} md={4} sm={12} lg={4}>
             <Card>
               <Card.Header>Featured</Card.Header>
               <Card.Body>
-                <Card.Title>Special title treatment</Card.Title>
-                <Card.Text>
-                  With supporting text below as a natural lead-in to additional content.
-                </Card.Text>
+                <Card.Title>{title}</Card.Title>
+                <Card.Text>{description}</Card.Text>
                 <div className='d-flex justify-content-between'>
                   <Link href={`/challenges/view-challenge/${id}`} passHref>
                     <Button variant="outline-info">View</Button>
@@ -30,16 +36,22 @@ const Challenges = () => {
             </Card>
           </Col>
         );
-      })}
+      }) : <h3>There're no challenges yet</h3>}
     </Row>
   );
-}
+};
 
-const challenges = [
-  { header: 'Featured', id: 2, subheader: 'Special title treatment', description: 'With supporting text below as a natural lead-in to additional content.' },
-  { header: 'Featured', id: 3, subheader: 'Special title treatment', description: 'With supporting text below as a natural lead-in to additional content.' },
-  { header: 'Featured', id: 4, subheader: 'Special title treatment', description: 'With supporting text below as a natural lead-in to additional content.' },
-  { header: 'Featured', id: 5, subheader: 'Special title treatment', description: 'With supporting text below as a natural lead-in to additional content.' },
-]
+export async function getServerSideProps(ctx) {
+  const data = parseCookies(ctx.req);
+
+  try {
+    const { token } = JSON.parse(data.user);
+    const client = createApolloClient(token);
+    const { data: { listChallengeRooms } } = await client.query({ query: GET_CHALLENGE_ROOMS_LIST });
+    return { props: { challenges: listChallengeRooms } };
+  } catch (error) {
+    return { props: { errorMessage: error.message } };
+  }
+}
 
 export default Challenges;
